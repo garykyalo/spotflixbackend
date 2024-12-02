@@ -1,14 +1,22 @@
-from sqlalchemy.orm import Session
-from .database import  Course, Curriculum
+billing_durations = [
+    {"period": "Monthly", "multiplier": 1},
+    {"period": "Semi-annually", "multiplier": 6},
+    {"period": "Annually", "multiplier": 12}
+]
 
-# extracts courses from the database
-def extractCoursedata(db: Session):
-    results = db.query(Course, Curriculum.module_name, Curriculum.module_description).outerjoin(
-        Curriculum, Course.course_id == Curriculum.course_id).all()
-    courses_dict = list({
-        course.course_id: {**{column.name: getattr(course, column.name) for column in Course.__table__.columns}, 
-                           "modules": [{"module_name": module_name, "module_description": module_desc} 
-                                       for _, module_name, module_desc in results if _ == course]}
-                                       for course, _, _ in results}.values())
-    return courses_dict
+equipment_option = [
+    {"option": "Purchase Equipment", "value": 2000},
+    {"option": "Pay in Installments", "value": 500},
+    {"option": "Company Property", "value": 0}
+]
+
+def calculate_amount(amount, billing_period, equipment_choice):
+    billing_multiplier = list(
+        map(lambda item: item["multiplier"], filter(lambda item: item["period"] == billing_period, billing_durations))
+    )[0]  
+    equipment_value = list(
+        map(lambda item: item["value"], filter(lambda item: item["option"] == equipment_choice, equipment_option))
+    )[0]  
+    total_amount = (amount * billing_multiplier) + equipment_value
+    return total_amount
 
