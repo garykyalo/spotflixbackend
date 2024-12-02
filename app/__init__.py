@@ -5,7 +5,7 @@ from .routes import router as app_router
 
 origins = [
     "http://localhost:5173",
-    "https://academy.garrytek.com"
+    "https://spotfix.vercel.app"
 ]
 
 def create_app() -> FastAPI:
